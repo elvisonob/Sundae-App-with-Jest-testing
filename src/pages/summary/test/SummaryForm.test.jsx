@@ -1,5 +1,5 @@
 import SummaryForm from './../SummaryForm';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 test('Initial conditions', () => {
@@ -38,7 +38,7 @@ test('popover responds to hover', async () => {
 
   // popover starts out hidden
   const nullPopover = screen.queryByText(
-    /no ice cream will actually be delivered/i
+    /No ice cream will actually be delivered/i
   );
   expect(nullPopover).not.toBeInTheDocument();
 
@@ -48,5 +48,10 @@ test('popover responds to hover', async () => {
   const popOver = screen.getByText(/no ice cream will actually be delivered/i);
   expect(popOver).toBeInTheDocument();
 
+  await waitFor(async () => {
+    await user.unhover(termsAndConditions);
+  });
   // popover disappears when we mouse out
+  await user.unhover(termsAndConditions);
+  expect(popOver).not.toBeInTheDocument();
 });
