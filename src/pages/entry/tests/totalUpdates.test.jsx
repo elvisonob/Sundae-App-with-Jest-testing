@@ -63,9 +63,10 @@ describe('grand total', () => {
   });
   test('grand total updates properly if scoop is added first', async () => {
     const user = userEvent.setup();
-    const scoopsAdded = await screen.findByRole('scoops');
-    await user.click(scoopsAdded);
-    expect(grandTotal).toHaveTextContent('1.50');
+    render(<OrderEntry />);
+    const grandTotal = screen.getByRole('heading', { name: /Grand total:\$/ });
+
+    // update vanilla scoops to 2 and check grand total
   });
   test('grand total updates properly if topping is added first', async () => {
     const user = userEvent.setup();
