@@ -72,7 +72,7 @@ describe('grand total', () => {
     const user = userEvent.setup();
     const toppingsAdded = await screen.findByRole('toppings');
     await user.click(toppingsAdded);
-    expect(grandTotal).toHaveTextContent('3.50');
+    expect(grandTotal).toHaveTextContent('4.50');
   });
   test('grand total updates properly if item is removed', async () => {
     const user = userEvent.setup();
