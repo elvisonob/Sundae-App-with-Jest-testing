@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import Options from '../Options';
+import OrderEntry from '../OrderEntry';
 
 test('update scoop subtotal when scoops change', async () => {
   const user = userEvent.setup();
@@ -30,4 +31,56 @@ test('update scoop subtotal when scoops change', async () => {
 
   // Here i check the subtotal
   expect(scoopsSubtotal).toHaveTextContent('6.00');
+});
+
+test('update toppings subtotal when toppings change', async () => {
+  const user = userEvent.setup();
+  render(<Options optionType="toppings" />);
+
+  // make sure total starts out at $0.00
+  const toppingsTotal = screen.getByText('Toppings total: $', { exact: false });
+  expect(toppingsTotal).toHaveTextContent('0.00');
+
+  // add cherries and check subtotal
+  const cherriesCheckbox = await screen.findByRole('checkbox', {
+    name: 'Cherries',
+  });
+  await user.click(cherriesCheckbox);
+  expect(toppingsTotal).toHaveTextContent('1.50');
+
+  // add hot fudge and check subtotal
+  const hotFudgeCheckbox = screen.getByRole('checkbox', { name: 'Hot fudge' });
+  await user.click(hotFudgeCheckbox);
+  expect(toppingsTotal).toHaveTextContent('3.00');
+});
+
+describe('grand total', () => {
+  test('grand total starts at $0.00', () => {
+    //RCSE
+    render(<OrderEntry />);
+    const grandTotal = screen.getByRole('heading', { name: /Grand total:\$/ });
+    expect(grandTotal).toHaveTextContent('0.00');
+  });
+  test('grand total updates properly if scoop is added first', async () => {
+    const user = userEvent.setup();
+    const scoopsAdded = await screen.findByRole('scoops');
+    await user.click(scoopsAdded);
+    expect(grandTotal).toHaveTextContent('1.50');
+  });
+  test('grand total updates properly if topping is added first', async () => {
+    const user = userEvent.setup();
+    const toppingsAdded = await screen.findByRole('toppings');
+    await user.click(toppingsAdded);
+    expect(grandTotal).toHaveTextContent('3.50');
+  });
+  test('grand total updates properly if item is removed', async () => {
+    const user = userEvent.setup();
+    // select an item
+    const items = screen.getByText('scoppings and toppings');
+
+    //remove an item and update grand total
+    await user.click(items);
+
+    expect(grandTotal).not.toHaveTextContent(items);
+  });
 });
